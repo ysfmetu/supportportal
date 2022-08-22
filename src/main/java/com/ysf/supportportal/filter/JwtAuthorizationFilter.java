@@ -1,7 +1,7 @@
 package com.ysf.supportportal.filter;
 
-import com.ysf.supportportal.controller.utility.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
+import com.ysf.supportportal.controller.utility.JWTTokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,14 +21,16 @@ import static com.ysf.supportportal.constant.SecurityConstant.TOKEN_PREFIX;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
 
-@RequiredArgsConstructor
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
-    private JwtTokenProvider jwtTokenProvider;
+    private JWTTokenProvider jwtTokenProvider;
+
+    public JwtAuthorizationFilter(JWTTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         if (request.getMethod().equalsIgnoreCase(OPTIONS_HTTP_METHOD)) {
             response.setStatus(OK.value());
         } else {

@@ -13,9 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
@@ -25,21 +25,25 @@ import static java.util.Arrays.stream;
 
 import java.util.stream.Collectors;
 
-public class JwtTokenProvider {
+@Component
+public class JWTTokenProvider {
+
     @Value("${jwt.secret}")
     private String secret;
 
-    public String generateJwtToken(UserPrincipal userPrincipal){
-        String[] claims=getClaimsFromUser(userPrincipal);
-        return JWT.create()
-                .withIssuer(GET_ARRAYS_LLC)
-                .withAudience(SecurityConstant.GET_ARRAYS_ADMINISTRATION)
-                .withIssuedAt(new Date())
-                .withSubject(userPrincipal.getUsername())
-                .withArrayClaim(SecurityConstant.AUTHORITIES,claims)
-                .withExpiresAt(new Date(System.currentTimeMillis() +SecurityConstant.EXPIRATION_TIME))
+    public String generateJwtToken(UserPrincipal userPrincipal) {
+        String[] claims = getClaimsFromUser(userPrincipal);
+        return JWT.create().withIssuer(GET_ARRAYS_LLC).withAudience(GET_ARRAYS_ADMINISTRATION)
+                .withIssuedAt(new Date()).withSubject(userPrincipal.getUsername())
+                .withArrayClaim(AUTHORITIES, claims).withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(HMAC512(secret.getBytes()));
     }
+
+    public List<GrantedAuthority> getAuthorities(String token) {
+        String[] claims = getClaimsFromToken(token);
+        return stream(claims).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
     public Authentication getAuthentication(String username, List<GrantedAuthority> authorities, HttpServletRequest request) {
         UsernamePasswordAuthenticationToken userPasswordAuthToken = new
                 UsernamePasswordAuthenticationToken(username, null, authorities);
@@ -51,22 +55,19 @@ public class JwtTokenProvider {
         JWTVerifier verifier = getJWTVerifier();
         return StringUtils.isNotEmpty(username) && !isTokenExpired(verifier, token);
     }
+
     public String getSubject(String token) {
         JWTVerifier verifier = getJWTVerifier();
         return verifier.verify(token).getSubject();
     }
+
     private boolean isTokenExpired(JWTVerifier verifier, String token) {
         Date expiration = verifier.verify(token).getExpiresAt();
         return expiration.before(new Date());
     }
 
-    public List<GrantedAuthority> getAuthorities(String token) {
-        String[] claims = getClaimsFromToken(token);
-        return stream(claims).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-    }
-
     private String[] getClaimsFromToken(String token) {
-        JWTVerifier verifier=getJWTVerifier();
+        JWTVerifier verifier = getJWTVerifier();
         return verifier.verify(token).getClaim(AUTHORITIES).asArray(String.class);
     }
 
@@ -81,31 +82,13 @@ public class JwtTokenProvider {
         return verifier;
     }
 
-    private String[] getClaimsFromUser(UserPrincipal userPrincipal) {
-        List<String> authorities=new ArrayList<>();
-        for (GrantedAuthority grantedAuthority:userPrincipal.getAuthorities()){
+    private String[] getClaimsFromUser(UserPrincipal user) {
+        List<String> authorities = new ArrayList<>();
+        for (GrantedAuthority grantedAuthority : user.getAuthorities()){
             authorities.add(grantedAuthority.getAuthority());
         }
         return authorities.toArray(new String[0]);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
+
+

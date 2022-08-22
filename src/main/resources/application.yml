@@ -2,7 +2,7 @@ server:
   port: 8081
 
 jwt:
-  secret:'[a-zA-Z0-9._]^+$Guidelines89797987forAlphabeticalArraNumeralsandOtherSymbo$'
+  secret: '[a-zA-Z0-9._]^+$Guidelines89797987forAlphabeticalArraNumeralsandOtherSymbo$'
 
 spring:
   datasource:
