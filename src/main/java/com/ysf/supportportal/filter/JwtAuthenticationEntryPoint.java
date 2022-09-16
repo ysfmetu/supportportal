@@ -1,7 +1,6 @@
 package com.ysf.supportportal.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ysf.supportportal.constant.SecurityConstant;
 import com.ysf.supportportal.domain.HttpResponse;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import org.springframework.security.core.AuthenticationException;
