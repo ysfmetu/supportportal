@@ -12,6 +12,13 @@ kaydetmiş olduğumuz kullanıcımızın otomatik oluşan passwordu ile giriş i
 token bilgisinin oluştuğunu headers kısmında görebiliyoruz 
 ![image](https://user-images.githubusercontent.com/45200802/191743692-49b09fac-a615-4146-baa7-8f0881724cb7.png)
 
+görülen jwt tokeni jwt.io adresinden inceleyebiliriz.. vermiş olduğumuz değerler karşımıza çıkacaktır.
+aşağıdaki ekranda da görüldüğü gibi payload kısmında token oluştururken girdiğimiz değerler gözükacektir
+aşağıda signature verify işlemi de test edildi ve token düzgün şekilde oluştuğu görüldü
+![image](https://user-images.githubusercontent.com/45200802/191744743-bd0cc0dc-ed97-4472-913e-8ceb61d34ff4.png)
+
+
+
 
 
 
