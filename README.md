@@ -9,6 +9,10 @@ kaydetmiş olduğumuz kullanıcımızın otomatik oluşan passwordu ile giriş i
 
 ![image](https://user-images.githubusercontent.com/45200802/191742442-fa6800ec-d50f-41ab-9dc1-6e55334551c1.png)
 
+token bilgisinin oluştuğunu headers kısmında görebiliyoruz 
+![image](https://user-images.githubusercontent.com/45200802/191743692-49b09fac-a615-4146-baa7-8f0881724cb7.png)
+
+
 
 
 
