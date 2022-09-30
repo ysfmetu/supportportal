@@ -33,10 +33,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     public static final String DEFAULT_USER_IMAGE_PATH = "/user/image/profile/temp";
     private Logger LOGGER= LoggerFactory.getLogger(getClass());
-    @Autowired
+
     private UserRepository userRepository;
-    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    private LoginAttemptService loginAttemptService;
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.loginAttemptService = loginAttemptService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -46,6 +52,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             LOGGER.error("username Not Found" + username);
             throw new UsernameNotFoundException("Girmiş olduğun kullanıcı geçerli değildir. kullanıcı adın :" + username);
         } else {
+            validateLoginAttempt(user);
             user.setLastLoginDateDisplay(user.getLastLoginDate());
             user.setLastLoginDate(new Date());
             userRepository.save(user);
@@ -53,6 +60,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             LOGGER.info("kullanıcı doğrulanmıştır.: " + username);
         }
         return userPrincipal;
+    }
+
+    private void validateLoginAttempt(User user)  {
+        if(user.isNotLocked()){
+            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())){
+                user.setNotLocked(false);
+            }else{
+                user.setNotLocked(true);
+            }
+        }else {
+            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
+        }
     }
 
     @Override
