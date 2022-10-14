@@ -16,6 +16,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+
 import static com.ysf.supportportal.constant.SecurityConstant.JWT_TOKEN_HEADER;
 
 @RestController
@@ -58,7 +60,7 @@ public class UserController extends ExceptionHandling {
     }
 
     @PostMapping("register")
-    public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, EmailExistException, UsernameExistException {
+    public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
         User newUser=userService.register(user.getFirstName(),user.getLastName(),user.getUsername(),user.getEmail());
 
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);

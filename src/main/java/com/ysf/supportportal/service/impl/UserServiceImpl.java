@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 
+import javax.mail.MessagingException;
 import java.util.Date;
 import java.util.List;
 
@@ -37,11 +38,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private UserRepository userRepository;
     private BCryptPasswordEncoder passwordEncoder;
     private LoginAttemptService loginAttemptService;
+    private EmailService emailService;
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService) {
+    public UserServiceImpl(UserRepository userRepository, EmailService emailService, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -75,7 +79,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, EmailExistException, UsernameExistException {
+    public User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
 
         validateNewUsernameAndEmail(StringUtils.EMPTY,username,email);
         User user=new User();
@@ -95,6 +99,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             user.setProfileImageUrl(getTemporaryProfileImageUrl());
             userRepository.save(user);
             LOGGER.info("yeni kullanıcı şifresi ="+password);
+            emailService.sendNewPasswordEmail(firstName,password,email);
 
         return user;
     }
